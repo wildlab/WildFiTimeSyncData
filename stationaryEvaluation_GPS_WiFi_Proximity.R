@@ -5,80 +5,82 @@ library(RColorBrewer)
 library(lubridate)
 library(dplyr)
 
-dataWiFi <- read.csv(file = 'stationaryData_WiFi.csv')
-dataGPS <- read.csv(file = 'stationaryData_GPS.csv')
+### ------------ SETTINGS ------------
 
-#IMPORTANT: use mad() with constant=1
+# plot settings
+textSize <- 20
 
-### settings
-textSize <- 45
-
-### calculate colors
+# colors
 n <- 60
 qual_col_pals = brewer.pal.info[brewer.pal.info$category == 'qual',]
 col_vector = unlist(mapply(brewer.pal, qual_col_pals$maxcolors, rownames(qual_col_pals)))
+colorForProximity <- "#5c9090"
+colorForTemperature <- "#ff635b"
+colorForProxResync <- "#797878"
 
-### ------------ WiFi ------------
+### ------------ WIFI ------------
 
-# convert time diff to number
-dataWiFi$NTPminusSYS <- as.numeric(as.character(dataWiFi$NTPminusSYS))
+# read data
+dataWiFi <- read.csv(file = 'stationaryData_WiFi.csv')
 
-# remove failed synchronization attempts (e.g., timeouts)
-dataWiFi <- dataWiFi[!(dataWiFi$NTPminusSYS %in% c(NA)), ]
+# convert time difference to ground truth to number
+dataWiFi$timeDifferenceTo1PPSms <- as.numeric(as.character(dataWiFi$timeDifferenceTo1PPSms))
 
-# reduce data set
-dataBroadband <- dataWiFi[(dataWiFi$NetworkClass %in% c("Broadband")), ]
-dataLTE <- dataWiFi[(dataWiFi$NetworkClass %in% c("Mobile LTE")), ]
-data2G <- dataWiFi[(dataWiFi$NetworkClass %in% c("Mobile 2G")), ]
+# remove failed synchronization attempts (e.g., WiFi connection timeouts)
+dataWiFi <- dataWiFi[!(dataWiFi$timeDifferenceTo1PPSms %in% c(NA)), ]
+
+# split data set based on internet access
+dataBroadband <- dataWiFi[(dataWiFi$networkClass %in% c("Broadband")), ]
+dataLTE <- dataWiFi[(dataWiFi$networkClass %in% c("Mobile LTE")), ]
+data2G <- dataWiFi[(dataWiFi$networkClass %in% c("Mobile 2G")), ]
 
 # results broadband
 print("Broadband")
-length(dataBroadband$NTPminusSYS)
-min(dataBroadband$NTPminusSYS)
-max(dataBroadband$NTPminusSYS)
-mean(dataBroadband$NTPminusSYS)
-sd(dataBroadband$NTPminusSYS)
-median(dataBroadband$NTPminusSYS)
-mad(dataBroadband$NTPminusSYS,constant=1)
+length(dataBroadband$timeDifferenceTo1PPSms)
+min(dataBroadband$timeDifferenceTo1PPSms)
+max(dataBroadband$timeDifferenceTo1PPSms)
+mean(dataBroadband$timeDifferenceTo1PPSms)
+sd(dataBroadband$timeDifferenceTo1PPSms)
+median(dataBroadband$timeDifferenceTo1PPSms)
+mad(dataBroadband$timeDifferenceTo1PPSms,constant=1)
 
 # results LTE
 print("Mobile LTE")
-length(dataLTE$NTPminusSYS)
-min(dataLTE$NTPminusSYS)
-max(dataLTE$NTPminusSYS)
-mean(dataLTE$NTPminusSYS)
-sd(dataLTE$NTPminusSYS)
-median(dataLTE$NTPminusSYS)
-mad(dataLTE$NTPminusSYS,constant=1)
+length(dataLTE$timeDifferenceTo1PPSms)
+min(dataLTE$timeDifferenceTo1PPSms)
+max(dataLTE$timeDifferenceTo1PPSms)
+mean(dataLTE$timeDifferenceTo1PPSms)
+sd(dataLTE$timeDifferenceTo1PPSms)
+median(dataLTE$timeDifferenceTo1PPSms)
+mad(dataLTE$timeDifferenceTo1PPSms,constant=1)
 
 # results 2G
 print("Mobile 2G")
-length(data2G$NTPminusSYS)
-min(data2G$NTPminusSYS)
-max(data2G$NTPminusSYS)
-mean(data2G$NTPminusSYS)
-sd(data2G$NTPminusSYS)
-median(data2G$NTPminusSYS)
-mad(data2G$NTPminusSYS,constant=1)
+length(data2G$timeDifferenceTo1PPSms)
+min(data2G$timeDifferenceTo1PPSms)
+max(data2G$timeDifferenceTo1PPSms)
+mean(data2G$timeDifferenceTo1PPSms)
+sd(data2G$timeDifferenceTo1PPSms)
+median(data2G$timeDifferenceTo1PPSms)
+mad(data2G$timeDifferenceTo1PPSms,constant=1)
 
 # results complete WiFi
 print("Complete")
-length(dataWiFi$NTPminusSYS)
-min(dataWiFi$NTPminusSYS)
-max(dataWiFi$NTPminusSYS)
-mean(dataWiFi$NTPminusSYS)
-sd(dataWiFi$NTPminusSYS)
-median(dataWiFi$NTPminusSYS)
-mad(dataWiFi$NTPminusSYS,constant=1)
+length(dataWiFi$timeDifferenceTo1PPSms)
+min(dataWiFi$timeDifferenceTo1PPSms)
+max(dataWiFi$timeDifferenceTo1PPSms)
+mean(dataWiFi$timeDifferenceTo1PPSms)
+sd(dataWiFi$timeDifferenceTo1PPSms)
+median(dataWiFi$timeDifferenceTo1PPSms)
+mad(dataWiFi$timeDifferenceTo1PPSms,constant=1)
 
-plotWiFi <- ggplot(data=dataWiFi, aes(x=factor(NetworkClass, level=c('Broadband', 'Mobile LTE', 'Mobile 2G')), y=NTPminusSYS, color=NetworkClass, fill=NetworkClass)) +
-  geom_violin(data=dataWiFi, aes(y=NTPminusSYS), width = 1.6, size = 3, fill = NA) +
-  geom_boxplot(data=dataWiFi, aes(y=NTPminusSYS), width = 0.025, size = 2) +
+plotWiFi <- ggplot(data=dataWiFi, aes(x=factor(networkClass, level=c('Broadband', 'Mobile LTE', 'Mobile 2G')), y=timeDifferenceTo1PPSms, color=networkClass, fill=networkClass)) +
+  geom_violin(data=dataWiFi, aes(y=timeDifferenceTo1PPSms), width = 1.6, size = 3, fill = NA) +
+  geom_boxplot(data=dataWiFi, aes(y=timeDifferenceTo1PPSms), width = 0.025, size = 2) +
   stat_summary(fun.y=median, geom="point", shape=23, size=10, stroke=3, fill="white") +
   scale_y_continuous(trans=scales::pseudo_log_trans(), limits=c(-7000, 7000), breaks=c(-7000,-1000,-100,-10,-1,0,1,10,100,1000,7000)) +
   theme_minimal() +
   theme(text = element_text(size=textSize)) +
-  #theme(axis.text.x = element_text(angle = 0, vjust = 1.0, hjust = 1.0)) +
   theme(panel.grid.minor.y = element_blank()) +
   theme(legend.position = "none") +
   theme(panel.grid.major = element_line(color = "grey", size = 1.5, linetype = 3)) +
@@ -90,44 +92,44 @@ plotWiFi <- ggplot(data=dataWiFi, aes(x=factor(NetworkClass, level=c('Broadband'
 
 ### ------------ GPS ------------
 
-# convert time diff to number and convert us to ms
-dataGPS$PPStoUART <- as.numeric(as.character(dataGPS$PPStoUART)) / 1000.0
+# read data
+dataGPS <- read.csv(file = 'stationaryData_GPS.csv')
 
-# reduce data set
-dataGPS <- dataGPS[!(dataGPS$PPStoUART %in% c(NA)), ]
+# convert time difference to number and convert us to ms
+dataGPS$timeDifferenceTo1PPSus <- as.numeric(as.character(dataGPS$timeDifferenceTo1PPSus)) / 1000.0
 
-# substract GPS UART compensation from Georg
-dataGPS$PPStoUART[dataGPS$Sats<4] <- dataGPS$PPStoUART[dataGPS$Sats<4] - 73.0
-dataGPS$PPStoUART[dataGPS$Sats==4] <- dataGPS$PPStoUART[dataGPS$Sats==4] - 73.0
-dataGPS$PPStoUART[dataGPS$Sats==5] <- dataGPS$PPStoUART[dataGPS$Sats==5] - 77.0
-dataGPS$PPStoUART[dataGPS$Sats==6] <- dataGPS$PPStoUART[dataGPS$Sats==6] - 142.0
-dataGPS$PPStoUART[dataGPS$Sats==7] <- dataGPS$PPStoUART[dataGPS$Sats==7] - 155.0
-dataGPS$PPStoUART[dataGPS$Sats==8] <- dataGPS$PPStoUART[dataGPS$Sats==8] - 167.0
-dataGPS$PPStoUART[dataGPS$Sats==9] <- dataGPS$PPStoUART[dataGPS$Sats==9] - 179.0
-dataGPS$PPStoUART[dataGPS$Sats==10] <- dataGPS$PPStoUART[dataGPS$Sats==10] - 194.0
-dataGPS$PPStoUART[dataGPS$Sats==11] <- dataGPS$PPStoUART[dataGPS$Sats==11] - 225.0
-dataGPS$PPStoUART[dataGPS$Sats>11] <- dataGPS$PPStoUART[dataGPS$Sats>11] - 225.0
+# reduce data set, removing GPS timeouts
+dataGPS <- dataGPS[!(dataGPS$timeDifferenceTo1PPSus %in% c(NA)), ]
+
+# substract GPS UART delay compensation for Quectel L70
+dataGPS$timeDifferenceTo1PPSus[dataGPS$GPSNumberOfSatellites<4] <- dataGPS$timeDifferenceTo1PPSus[dataGPS$GPSNumberOfSatellites<4] - 73.0
+dataGPS$timeDifferenceTo1PPSus[dataGPS$GPSNumberOfSatellites==4] <- dataGPS$timeDifferenceTo1PPSus[dataGPS$GPSNumberOfSatellites==4] - 73.0
+dataGPS$timeDifferenceTo1PPSus[dataGPS$GPSNumberOfSatellites==5] <- dataGPS$timeDifferenceTo1PPSus[dataGPS$GPSNumberOfSatellites==5] - 77.0
+dataGPS$timeDifferenceTo1PPSus[dataGPS$GPSNumberOfSatellites==6] <- dataGPS$timeDifferenceTo1PPSus[dataGPS$GPSNumberOfSatellites==6] - 142.0
+dataGPS$timeDifferenceTo1PPSus[dataGPS$GPSNumberOfSatellites==7] <- dataGPS$timeDifferenceTo1PPSus[dataGPS$GPSNumberOfSatellites==7] - 155.0
+dataGPS$timeDifferenceTo1PPSus[dataGPS$GPSNumberOfSatellites==8] <- dataGPS$timeDifferenceTo1PPSus[dataGPS$GPSNumberOfSatellites==8] - 167.0
+dataGPS$timeDifferenceTo1PPSus[dataGPS$GPSNumberOfSatellites==9] <- dataGPS$timeDifferenceTo1PPSus[dataGPS$GPSNumberOfSatellites==9] - 179.0
+dataGPS$timeDifferenceTo1PPSus[dataGPS$GPSNumberOfSatellites==10] <- dataGPS$timeDifferenceTo1PPSus[dataGPS$GPSNumberOfSatellites==10] - 194.0
+dataGPS$timeDifferenceTo1PPSus[dataGPS$GPSNumberOfSatellites==11] <- dataGPS$timeDifferenceTo1PPSus[dataGPS$GPSNumberOfSatellites==11] - 225.0
+dataGPS$timeDifferenceTo1PPSus[dataGPS$GPSNumberOfSatellites>11] <- dataGPS$timeDifferenceTo1PPSus[dataGPS$GPSNumberOfSatellites>11] - 225.0
 
 # output complete dataset
 print("GPS with compensation")
-length(dataGPS$PPStoUART)
-min(dataGPS$PPStoUART)
-max(dataGPS$PPStoUART)
-mean(dataGPS$PPStoUART)
-sd(dataGPS$PPStoUART)
-median(dataGPS$PPStoUART)
-mad(dataGPS$PPStoUART,constant=1)
+length(dataGPS$timeDifferenceTo1PPSus)
+min(dataGPS$timeDifferenceTo1PPSus)
+max(dataGPS$timeDifferenceTo1PPSus)
+mean(dataGPS$timeDifferenceTo1PPSus)
+sd(dataGPS$timeDifferenceTo1PPSus)
+median(dataGPS$timeDifferenceTo1PPSus)
+mad(dataGPS$timeDifferenceTo1PPSus,constant=1)
 
-plotGPS <- ggplot(dataGPS, aes(x='Delay-compensated GPS', y=PPStoUART)) +
+plotGPS <- ggplot(dataGPS, aes(x='Delay-compensated GPS', y=timeDifferenceTo1PPSus)) +
   geom_violin(width = 1.2, size = 3, fill = NA, color=col_vector[7]) +
   geom_boxplot(width = 0.025, size = 2, fill=col_vector[7], color=col_vector[7]) +
   stat_summary(fun.y=median, geom="point", shape=23, size=10, stroke=3, fill="white", color=col_vector[7]) +
-  #scale_y_continuous(limits = c(-70, 250),breaks=c(-50,0,50,100,150,200)) +
-  #scale_y_continuous(trans=scales::pseudo_log_trans(), limits=c(-100,250), breaks=c(-100,-10,-1,0,1,10,100)) +
   scale_y_continuous(trans=scales::pseudo_log_trans(), limits=c(-7000, 7000), breaks=c(-7000,-1000,-100,-10,-1,0,1,10,100,1000,7000)) +
   theme_minimal() +
   theme(text = element_text(size=textSize)) +
-  #theme(axis.text.x = element_text(angle = 0, vjust = 1.0, hjust = 1.0)) +
   theme(panel.grid.minor.y = element_blank()) +
   theme(legend.position = "none") +
   theme(panel.grid.major = element_line(color = "grey", size = 1.5, linetype = 3)) +
@@ -138,7 +140,7 @@ plotGPS <- ggplot(dataGPS, aes(x='Delay-compensated GPS', y=PPStoUART)) +
 
 ### ------------ PROXIMITY RESYNC ------------
 
-dataProximityResync <- read.csv(file = 'DataProximityResync/proxTimeDiffsGWTime_cropped.csv', dec = "." ,sep=",")
+dataProximityResync <- read.csv(file = 'stationaryData_Proximity.csv', dec = "." ,sep=",")
 
 dataProximityResync$timeDiffBMinusAMs <- -(dataProximityResync$timeDiffBMinusAMs * 1000)
 
@@ -152,17 +154,13 @@ sd(dataProximityResync$timeDiffBMinusAMs)
 median(dataProximityResync$timeDiffBMinusAMs)
 mad(dataProximityResync$timeDiffBMinusAMs,constant=1)
 
-proxResyncColor <- "#797878"
 plotProximityResync <- ggplot(dataProximityResync, aes(x='Proximity', y=timeDiffBMinusAMs)) +
-  geom_violin(width = 1.2, size = 3, fill = NA, color=proxResyncColor) +
+  geom_violin(width = 1.2, size = 3, fill = NA, color=colorForProxResync) +
   geom_boxplot(width = 0.025, size = 2, fill=proxResyncColor, color=proxResyncColor) +
   stat_summary(fun.y=median, geom="point", shape=23, size=10, stroke=3, fill="white", color=proxResyncColor) +
-  #scale_y_continuous(limits = c(-70, 250),breaks=c(-50,0,50,100,150,200)) +
-  #scale_y_continuous(trans=scales::pseudo_log_trans(), limits=c(-100,250), breaks=c(-100,-10,-1,0,1,10,100)) +
   scale_y_continuous(trans=scales::pseudo_log_trans(), limits=c(-7000, 7000), breaks=c(-7000,-1000,-100,-10,-1,0,1,10,100,1000,7000)) +
   theme_minimal() +
   theme(text = element_text(size=textSize)) +
-  #theme(axis.text.x = element_text(angle = 0, vjust = 1.0, hjust = 1.0)) +
   theme(panel.grid.minor.y = element_blank()) +
   theme(legend.position = "none") +
   theme(panel.grid.major = element_line(color = "grey", size = 1.5, linetype = 3)) +
@@ -170,25 +168,24 @@ plotProximityResync <- ggplot(dataProximityResync, aes(x='Proximity', y=timeDiff
   xlab("") +
   ylab("Relative time error Terror;relative (ms), displayed logarithmically")
 
-### ------------ PROXIMITY 16 DAYS ------------
+### ------------ PROXIMITY 16 DAYS EXPERIMENT ------------
 
-# NEW PLOT
-dataProximity <- read.csv(file = 'DataProximity16Days/proxTimeDiffsGWTime.csv', dec = "." ,sep=",")
-dataTagOutside <- read.csv(file = 'DataProximity16Days/mergedsubs_4C_75_25_94_6B_14_burstFormat_123464.csv', dec = "." ,sep=",")
-dataTagInside <- read.csv(file = 'DataProximity16Days/mergedsubs_4C_75_25_94_62_80_burstFormat_123464.csv', dec = "." ,sep=",")
+# read data
+dataProximity <- read.csv(file = 'stationaryData_Proximity_16d_Experiment.csv', dec = "." ,sep=",")
+dataTagOutside <- read.csv(file = 'stationaryData_Proximity_16d_Experiment_Tag_6B14.csv', dec = "." ,sep=",")
+dataTagInside <- read.csv(file = 'stationaryData_Proximity_16d_Experiment_Tag_6280.csv', dec = "." ,sep=",")
 
-# CONVERT TIMESTAMPS OF TAGS
+# convert timestamps of tags
 dataProximity$utcDate <- as.POSIXct(as.numeric(dataProximity$mostFrequentTimestampInGroup), origin = '1970-01-01', tz = 'GMT')
 dataTagOutside$utcDate <- as.POSIXct(as.numeric(dataTagOutside$utcTimestamp), origin = '1970-01-01', tz = 'GMT')
 dataTagInside$utcDate <- as.POSIXct(as.numeric(dataTagInside$utcTimestamp), origin = '1970-01-01', tz = 'GMT')
 
-# (TEMPORARY) REDUCE TIME
-#dataProximity <- dataProximity %>% filter(utcDate >= ymd_hms("2023-01-28 01:00:00"))
+# crop data at end of experiment
 dataProximity <- dataProximity %>% filter(utcDate <= ymd_hms("2024-01-23 18:00:00"))
 dataTagOutside <- dataTagOutside %>% filter(utcDate <= ymd_hms("2024-01-23 18:00:00"))
 dataTagInside <- dataTagInside %>% filter(utcDate <= ymd_hms("2024-01-23 18:00:00"))
 
-# FINAL DATA EVALUATION (NOT GROUPED, STATISTIC FROM OVERALL TIME DIFFERENCES BETWEEN TAGS)
+# final data evaluation (not grouped, statistic from overall time differences between tags)
 length(dataProximity$timeDiffMs)
 median(dataProximity$timeDiffMs)
 mad(dataProximity$timeDiffMs,constant=1)
@@ -203,12 +200,7 @@ max(dataTagInside$temperatureInDegCel)
 min(dataTagOutside$temperatureInDegCel)
 max(dataTagOutside$temperatureInDegCel)
 
-colorForProximity <- "#5c9090"
-colorForTemperature <- "#ff635b"
-
 plotProximity <- ggplot() +
-  #geom_point(data=dataProximity, aes(utcDate, timeDiffMs*1000), size=4.5, color=colorForProximity, shape=18, alpha=1) + 
-  #geom_line(data=dataProximity, aes(utcDate, timeDiffMs*1000), size=2, color=colorForProximity, alpha=1) +
   geom_area(data=dataProximity, aes(utcDate, timeDiffMs*1000), fill="#a1a1a1") +
   
   geom_line(data=dataTagInside, aes(utcDate, temperatureInDegCel), size=4, color=colorForTemperature, alpha=1) +
@@ -216,7 +208,7 @@ plotProximity <- ggplot() +
   
   scale_x_datetime(date_breaks = "1 day", date_labels = "%Y-%m-%d") + #%Y-%m-%d %H:%M
   scale_y_continuous(limits=c(-10, 60), breaks=c(0,20,40,60),
-    sec.axis = sec_axis(~ ., name = "Temperature (?C)", breaks=c(-10,0, 10, 20, 30))) +
+    sec.axis = sec_axis(~ ., name = "Temperature (deg C)", breaks=c(-10,0, 10, 20, 30))) +
   theme_minimal() +
   theme(text = element_text(size=textSize)) +
   theme(axis.text.x = element_text(angle = 60, vjust = 1.0, hjust = 1.0)) +
@@ -232,7 +224,7 @@ plotProximity <- ggplot() +
   ylab("Relative time error Terror;relative (ms)") +
   labs(size='#Tags(t)')
 
-### ------------ COMBINED PLOT ------------
+### ------------ COMBINED PLOT: WIFI, GPS, PROXIMITY ------------
 
 grid.arrange(
   arrangeGrob(
@@ -245,37 +237,49 @@ grid.arrange(
   heights = c(0.6, 0.4)
 )
 
-### ------------ QUANTILES ------------
+### ------------ QUANTILE CALCULATIONS ------------
 
-testQuantiles <- c(10,11,12)
-
-print(quantile(testQuantiles))
-
-quant <- quantile(abs(dataGPS$PPStoUART), 0.95)
+# 95% quantile of GPS data
+quant <- quantile(abs(dataGPS$timeDifferenceTo1PPSus), 0.95)
 print(quant)
 
-quant <- quantile(abs(dataWiFi$NTPminusSYS), 0.95)
+# 95% quantile of WiFi data
+quant <- quantile(abs(dataWiFi$timeDifferenceTo1PPSms), 0.95)
 print(quant)
 
-dataGPSandWiFi <- c(dataGPS$PPStoUART, dataWiFi$NTPminusSYS)
+# quantiles of both methods combined
+dataGPSandWiFi <- c(dataGPS$timeDifferenceTo1PPSus, dataWiFi$timeDifferenceTo1PPSms)
 quant <- quantile(abs(dataGPSandWiFi), c(0.75, 0.85, 0.95))
 print(quant)
 
-rtcSpecPerDay <- 130*2 # 130 or 260
+# quantiles for RTC between 0 and 50deg C
+print("Quantiles between 0 and 50deg C:")
+rtcSpecPerDay <- 130 # max. drift in ms
 
-maxRTCDriftInTenMin <- ((rtcSpecPerDay/24)/6) # max drift of used RTC between 0 and 50?C
+maxRTCDriftInTenMin <- ((rtcSpecPerDay/24)/6)
 quantOnceEveryTenMin <- quant + maxRTCDriftInTenMin
 print(quantOnceEveryTenMin)
 
-maxRTCDriftInOneHour <- (rtcSpecPerDay/24) # max drift of used RTC between 0 and 50?C
+maxRTCDriftInOneHour <- (rtcSpecPerDay/24)
 quantOnceAnHour <- quant + maxRTCDriftInOneHour
 print(quantOnceAnHour)
 
-maxRTCDriftInOneDay <- rtcSpecPerDay # max drift of used RTC between 0 and 50?C
+maxRTCDriftInOneDay <- rtcSpecPerDay
 quantOnceADay <- quant + maxRTCDriftInOneDay
 print(quantOnceADay)
 
-count_entries <- sum(abs(dataGPSandWiFi) <= 55.0272)
-print(count_entries)
-length(dataGPSandWiFi)
+# quantiles for RTC between -40 and 85deg C
+print("Quantiles between -40 and 85deg C:")
+rtcSpecPerDay <- 260 # max. drift in ms
 
+maxRTCDriftInTenMin <- ((rtcSpecPerDay/24)/6)
+quantOnceEveryTenMin <- quant + maxRTCDriftInTenMin
+print(quantOnceEveryTenMin)
+
+maxRTCDriftInOneHour <- (rtcSpecPerDay/24)
+quantOnceAnHour <- quant + maxRTCDriftInOneHour
+print(quantOnceAnHour)
+
+maxRTCDriftInOneDay <- rtcSpecPerDay
+quantOnceADay <- quant + maxRTCDriftInOneDay
+print(quantOnceADay)
