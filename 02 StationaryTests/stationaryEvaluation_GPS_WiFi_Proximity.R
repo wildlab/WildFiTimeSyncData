@@ -74,22 +74,6 @@ sd(dataWiFi$timeDifferenceTo1PPSms)
 median(dataWiFi$timeDifferenceTo1PPSms)
 mad(dataWiFi$timeDifferenceTo1PPSms,constant=1)
 
-plotWiFi <- ggplot(data=dataWiFi, aes(x=factor(networkClass, level=c('Broadband', 'Mobile LTE', 'Mobile 2G')), y=timeDifferenceTo1PPSms, color=networkClass, fill=networkClass)) +
-  geom_violin(data=dataWiFi, aes(y=timeDifferenceTo1PPSms), width = 1.6, size = 3, fill = NA) +
-  geom_boxplot(data=dataWiFi, aes(y=timeDifferenceTo1PPSms), width = 0.025, size = 2) +
-  stat_summary(fun.y=median, geom="point", shape=23, size=10, stroke=3, fill="white") +
-  scale_y_continuous(trans=scales::pseudo_log_trans(), limits=c(-7000, 7000), breaks=c(-7000,-1000,-100,-10,-1,0,1,10,100,1000,7000)) +
-  theme_minimal() +
-  theme(text = element_text(size=textSize)) +
-  theme(panel.grid.minor.y = element_blank()) +
-  theme(legend.position = "none") +
-  theme(panel.grid.major = element_line(color = "grey", size = 1.5, linetype = 3)) +
-  theme(axis.title.y = element_text(margin = margin(t = 0, r = 50, b = 0, l = 50))) +
-  xlab("") +
-  ylab("Time offset error Toff;WiFi (ms), displayed logarithmically") +
-  scale_color_manual(values = c("Broadband"=col_vector[1], "Mobile LTE"=col_vector[3], "Mobile 2G"=col_vector[5])) + 
-  scale_fill_manual(values = c("Broadband"=col_vector[1], "Mobile LTE"=col_vector[3], "Mobile 2G"=col_vector[5]))
-
 ### ------------ GPS ------------
 
 # read data
@@ -123,20 +107,6 @@ sd(dataGPS$timeDifferenceTo1PPSus)
 median(dataGPS$timeDifferenceTo1PPSus)
 mad(dataGPS$timeDifferenceTo1PPSus,constant=1)
 
-plotGPS <- ggplot(dataGPS, aes(x='Delay-compensated GPS', y=timeDifferenceTo1PPSus)) +
-  geom_violin(width = 1.2, size = 3, fill = NA, color=col_vector[7]) +
-  geom_boxplot(width = 0.025, size = 2, fill=col_vector[7], color=col_vector[7]) +
-  stat_summary(fun.y=median, geom="point", shape=23, size=10, stroke=3, fill="white", color=col_vector[7]) +
-  scale_y_continuous(trans=scales::pseudo_log_trans(), limits=c(-7000, 7000), breaks=c(-7000,-1000,-100,-10,-1,0,1,10,100,1000,7000)) +
-  theme_minimal() +
-  theme(text = element_text(size=textSize)) +
-  theme(panel.grid.minor.y = element_blank()) +
-  theme(legend.position = "none") +
-  theme(panel.grid.major = element_line(color = "grey", size = 1.5, linetype = 3)) +
-  theme(axis.title.y = element_text(margin = margin(t = 0, r = 50, b = 0, l = 50))) +
-  xlab("") +
-  ylab("Time offset error Toff;GPS (ms), displayed logarithmically")
-
 
 ### ------------ PROXIMITY RESYNC ------------
 
@@ -153,20 +123,6 @@ mean(dataProximityResync$timeDiffBMinusAMs)
 sd(dataProximityResync$timeDiffBMinusAMs)
 median(dataProximityResync$timeDiffBMinusAMs)
 mad(dataProximityResync$timeDiffBMinusAMs,constant=1)
-
-plotProximityResync <- ggplot(dataProximityResync, aes(x='Proximity', y=timeDiffBMinusAMs)) +
-  geom_violin(width = 1.2, size = 3, fill = NA, color=colorForProxResync) +
-  geom_boxplot(width = 0.025, size = 2, fill=proxResyncColor, color=proxResyncColor) +
-  stat_summary(fun.y=median, geom="point", shape=23, size=10, stroke=3, fill="white", color=proxResyncColor) +
-  scale_y_continuous(trans=scales::pseudo_log_trans(), limits=c(-7000, 7000), breaks=c(-7000,-1000,-100,-10,-1,0,1,10,100,1000,7000)) +
-  theme_minimal() +
-  theme(text = element_text(size=textSize)) +
-  theme(panel.grid.minor.y = element_blank()) +
-  theme(legend.position = "none") +
-  theme(panel.grid.major = element_line(color = "grey", size = 1.5, linetype = 3)) +
-  theme(axis.title.y = element_text(margin = margin(t = 0, r = 50, b = 0, l = 50))) +
-  xlab("") +
-  ylab("Relative time error Terror;relative (ms), displayed logarithmically")
 
 ### ------------ PROXIMITY 16 DAYS EXPERIMENT ------------
 
@@ -199,43 +155,6 @@ min(dataTagInside$temperatureInDegCel)
 max(dataTagInside$temperatureInDegCel)
 min(dataTagOutside$temperatureInDegCel)
 max(dataTagOutside$temperatureInDegCel)
-
-plotProximity <- ggplot() +
-  geom_area(data=dataProximity, aes(utcDate, timeDiffMs*1000), fill="#a1a1a1") +
-  
-  geom_line(data=dataTagInside, aes(utcDate, temperatureInDegCel), size=4, color=colorForTemperature, alpha=1) +
-  geom_line(data=dataTagOutside, aes(utcDate, temperatureInDegCel), size=4, color=colorForTemperature, alpha=1) +
-  
-  scale_x_datetime(date_breaks = "1 day", date_labels = "%Y-%m-%d") + #%Y-%m-%d %H:%M
-  scale_y_continuous(limits=c(-10, 60), breaks=c(0,20,40,60),
-    sec.axis = sec_axis(~ ., name = "Temperature (deg C)", breaks=c(-10,0, 10, 20, 30))) +
-  theme_minimal() +
-  theme(text = element_text(size=textSize)) +
-  theme(axis.text.x = element_text(angle = 60, vjust = 1.0, hjust = 1.0)) +
-  theme(legend.position = "none") +
-  theme(panel.grid.major.x = element_line(color = "grey", size = 1.5, linetype = 1)) +
-  theme(panel.grid.major.y = element_line(color = "grey", size = 1.5, linetype = 3)) +
-  theme(panel.grid.minor.x = element_blank()) +
-  theme(panel.grid.minor.y = element_line(color = "grey", size = 1.5, linetype = 3)) +
-  theme(axis.title.y = element_text(margin = margin(t = 0, r = 50, b = 0, l = 50))) +
-  theme(axis.title.y.right = element_text(margin = margin(t = 0, r = 0, b = 0, l = 50))) +
-  theme(axis.text.y.right = element_text(color = colorForTemperature), axis.title.y.right = element_text(color=colorForTemperature)) +
-  xlab("") +
-  ylab("Relative time error Terror;relative (ms)") +
-  labs(size='#Tags(t)')
-
-### ------------ COMBINED PLOT: WIFI, GPS, PROXIMITY ------------
-
-grid.arrange(
-  arrangeGrob(
-    plotGPS,plotWiFi,plotProximityResync,
-    ncol = 3,
-    widths=c(0.25, 0.5, 0.25)
-  ),
-  plotProximity,
-  ncol = 1,
-  heights = c(0.6, 0.4)
-)
 
 ### ------------ QUANTILE CALCULATIONS ------------
 
