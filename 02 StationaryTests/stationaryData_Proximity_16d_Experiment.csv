@@ -1,4 +1,4 @@
-groupCounter,mostFrequentTimestampInGroup,tagA,tagB,timeDiffMs,timeDiffBMinusAMs,tagCntInGroup
+groupCounter,mostFrequentTimestampInGroup,tagA,tagB,timeDiffSeconds,timeDiffBMinusAMs,tagCntInGroup
 1,1704794400,6B14,6280,0.0020,-0.0020,2
 2,1704798000,6B14,6280,0.0010,0.0010,2
 3,1704801600,6B14,6280,0.0030,0.0030,2
