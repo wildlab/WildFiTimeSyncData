@@ -28,23 +28,23 @@ dataTimeDiff <- dataTimeDiff[dataTimeDiff$tagA %in% ids, ]
 dataTimeDiff <- dataTimeDiff[dataTimeDiff$tagB %in% ids, ]
 
 # initial data evaluation, not grouped, statistic from overall time differences, but from all four receiving gateway (received messages at same time)
-length(dataTimeDiff$timeDiffMs)
-median(dataTimeDiff$timeDiffMs)
-mad(dataTimeDiff$timeDiffMs,constant=1)
-min(dataTimeDiff$timeDiffMs)
-max(dataTimeDiff$timeDiffMs)
-mean(dataTimeDiff$timeDiffMs)
-sd(dataTimeDiff$timeDiffMs)
+length(dataTimeDiff$timeDiffSeconds)
+median(dataTimeDiff$timeDiffSeconds)
+mad(dataTimeDiff$timeDiffSeconds,constant=1)
+min(dataTimeDiff$timeDiffSeconds)
+max(dataTimeDiff$timeDiffSeconds)
+mean(dataTimeDiff$timeDiffSeconds)
+sd(dataTimeDiff$timeDiffSeconds)
 
 # compare data evaluation with per gateway A, B, C and D
-median(dataTimeDiff[dataTimeDiff$gateway=="A",]$timeDiffMs)
-mad(dataTimeDiff[dataTimeDiff$gateway=="A",]$timeDiffMs,constant=1)
-median(dataTimeDiff[dataTimeDiff$gateway=="B",]$timeDiffMs)
-mad(dataTimeDiff[dataTimeDiff$gateway=="B",]$timeDiffMs,constant=1)
-median(dataTimeDiff[dataTimeDiff$gateway=="C",]$timeDiffMs)
-mad(dataTimeDiff[dataTimeDiff$gateway=="C",]$timeDiffMs,constant=1)
-median(dataTimeDiff[dataTimeDiff$gateway=="D",]$timeDiffMs)
-mad(dataTimeDiff[dataTimeDiff$gateway=="D",]$timeDiffMs,constant=1)
+median(dataTimeDiff[dataTimeDiff$gateway=="A",]$timeDiffSeconds)
+mad(dataTimeDiff[dataTimeDiff$gateway=="A",]$timeDiffSeconds,constant=1)
+median(dataTimeDiff[dataTimeDiff$gateway=="B",]$timeDiffSeconds)
+mad(dataTimeDiff[dataTimeDiff$gateway=="B",]$timeDiffSeconds,constant=1)
+median(dataTimeDiff[dataTimeDiff$gateway=="C",]$timeDiffSeconds)
+mad(dataTimeDiff[dataTimeDiff$gateway=="C",]$timeDiffSeconds,constant=1)
+median(dataTimeDiff[dataTimeDiff$gateway=="D",]$timeDiffSeconds)
+mad(dataTimeDiff[dataTimeDiff$gateway=="D",]$timeDiffSeconds,constant=1)
 
 # order tag ids to be able to group them (smaller ID comes first)
 dataTimeDiff <- dataTimeDiff %>%
@@ -59,7 +59,7 @@ dataTimeDiff <- dataTimeDiff %>%
 # now in case multiple gateways measured time differences at the same time: take the lowest time delay, as message collisions can cause delays, so the minimum will be most accurate
 dataTimeDiffMinOfGWs <- dataTimeDiff %>%
   group_by(mostFrequentTimestampInGroup, tagASorted, tagBSorted) %>%
-  slice(which.min(timeDiffMs))
+  slice(which.min(timeDiffSeconds))
 nrow(dataTimeDiff)
 nrow(dataTimeDiffMinOfGWs)
 
@@ -74,20 +74,20 @@ testRow2 <- dataTimeDiffMinOfGWs %>% filter(mostFrequentTimestampInGroup == 1674
 print(testRow2)
 
 # final data evaluation (grouped, statistic from overall time differences between tags)
-length(dataTimeDiffMinOfGWs$timeDiffMs)
-median(dataTimeDiffMinOfGWs$timeDiffMs)
-mad(dataTimeDiffMinOfGWs$timeDiffMs,constant=1)
-min(dataTimeDiffMinOfGWs$timeDiffMs)
-max(dataTimeDiffMinOfGWs$timeDiffMs)
-mean(dataTimeDiffMinOfGWs$timeDiffMs)
-sd(dataTimeDiffMinOfGWs$timeDiffMs)
+length(dataTimeDiffMinOfGWs$timeDiffSeconds)
+median(dataTimeDiffMinOfGWs$timeDiffSeconds)
+mad(dataTimeDiffMinOfGWs$timeDiffSeconds,constant=1)
+min(dataTimeDiffMinOfGWs$timeDiffSeconds)
+max(dataTimeDiffMinOfGWs$timeDiffSeconds)
+mean(dataTimeDiffMinOfGWs$timeDiffSeconds)
+sd(dataTimeDiffMinOfGWs$timeDiffSeconds)
 
 # group results by timestamp
 dataTimeDiffMinOfGWsGrouped <- dataTimeDiffMinOfGWs %>%
   group_by(mostFrequentTimestampInGroup) %>%
   summarise(
-    medianTimeDiff = median(timeDiffMs),
-    madTimeDiff = mad(timeDiffMs, constant=1),
+    medianTimeDiff = median(timeDiffSeconds),
+    madTimeDiff = mad(timeDiffSeconds, constant=1),
     measCnt = n(),
     uniqueTagIds = length(unique(c(tagA,tagB)))
   )
@@ -99,8 +99,8 @@ dataTimeDiffMinOfGWsGrouped$utcDate <- as.POSIXct(as.numeric(dataTimeDiffMinOfGW
 dataTimeDiffGrouped <- dataTimeDiff %>%
   group_by(mostFrequentTimestampInGroup, gateway) %>%
   summarise(
-    medianTimeDiff = median(timeDiffMs),
-    madTimeDiff = mad(timeDiffMs, constant=1),
+    medianTimeDiff = median(timeDiffSeconds),
+    madTimeDiff = mad(timeDiffSeconds, constant=1),
     measCnt = n(),
     uniqueTagIds = length(unique(c(tagA,tagB)))
   )
